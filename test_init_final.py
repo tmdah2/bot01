@@ -784,7 +784,7 @@ class taskCog(commands.Cog):
 		if ctx.voice_client is not None:
 			if ctx.voice_client.is_playing():
 				ctx.voice_client.stop()
-			await ctx.voice_client.disconnect()
+			await ctx.voice_client.disconnect(force=True)
 		boss_task = asyncio.Task(self.boss_check())
 
 	async def boss_check(self):
@@ -867,7 +867,7 @@ class taskCog(commands.Cog):
 					for voice_client in self.bot.voice_clients:
 						if voice_client.is_playing():
 							voice_client.stop()
-						await voice_client.disconnect()
+						await voice_client.disconnect(force=True)
 					await asyncio.sleep(2)
 
 					inidata_restart = repo_restart.get_contents("restart.txt")
@@ -1050,7 +1050,7 @@ class taskCog(commands.Cog):
 		for voice_client in self.bot.voice_clients:
 			if voice_client.is_playing():
 				voice_client.stop()
-			await voice_client.disconnect()
+			await voice_client.disconnect(force=True)
 
 		for t in asyncio.Task.all_tasks():
 			if t._coro.__name__ == f"boss_check":
@@ -1166,7 +1166,7 @@ class mainCog(commands.Cog):
 				return await ctx.send(f"시간이 초과됐습니다. **[{curr_guild_info.name}]** 서버 **[{setting_channel_name}]** 채널에서 사용해주세요!")
 
 			if str(reaction) == "⭕":
-				await ctx.voice_client.disconnect()
+				await ctx.voice_client.disconnect(force=True)
 				basicSetting[6] = ""
 				basicSetting[7] = int(ctx.message.channel.id)
 
@@ -1552,7 +1552,7 @@ class mainCog(commands.Cog):
 			for voice_client in self.bot.voice_clients:
 				if voice_client.is_playing():
 					voice_client.stop()
-				await voice_client.disconnect()
+				await voice_client.disconnect(force=True)
 			print("보탐봇강제재시작!")
 			await asyncio.sleep(2)
 
@@ -1936,13 +1936,13 @@ class mainCog(commands.Cog):
 		if ctx.message.channel.id == basicSetting[7]:
 			msg = ctx.message.content[len(ctx.invoked_with)+1:]
 			sayMessage = msg
-			await MakeSound(ctx.message.author.display_name +'님이, ' + sayMessage, './sound/say')
-			await ctx.send("```< " + ctx.author.display_name + " >님이 \"" + sayMessage + "\"```", tts=False)
 			try:
+				await MakeSound(ctx.message.author.display_name +'님이, ' + sayMessage, './sound/say')
+				await ctx.send("```< " + ctx.author.display_name + " >님이 \"" + sayMessage + "\"```", tts=False)
 				await PlaySound(ctx.voice_client, './sound/say.mp3')
 			except:
 				await ctx.send( f"```[음성채널]에 접속되지 않은 상태입니다. 접속 후 사용해주세요!```")
-				pass
+				return
 		else:
 			return
 
