@@ -2945,7 +2945,7 @@ class mainCog(commands.Cog):
 			reault_payback = price_reg_tax - price_real_tax
 			reault_payback1= price_reg_tax - input_money_data[1]
 
-			embed = discord.Embed(
+			embed2 = discord.Embed(
 					title = f"🧮  페이백 계산결과 (세율 {tax}% 기준) ",
 					description = f"**```fix\n{reault_payback1}```**",
 					color=0x00ff00
