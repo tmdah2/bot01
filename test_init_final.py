@@ -3493,7 +3493,7 @@ class IlsangDistributionBot(commands.AutoShardedBot):
 	async def close(self):
 		await self.session.close()
 		await super().close()
-		print("일상디코봇 종료 완료.")
+		print("디코봇 종료 완료.")
 
 ilsang_distribution_bot : IlsangDistributionBot = IlsangDistributionBot()
 ilsang_distribution_bot.add_cog(mainCog(ilsang_distribution_bot))
