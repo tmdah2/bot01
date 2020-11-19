@@ -3099,15 +3099,6 @@ class mainCog(commands.Cog):
 			reault_payback = price_reg_tax - price_real_tax
 			reault_payback1= price_reg_tax - input_money_data[1]
 
-			embed = discord.Embed(
-					title = f"🧮  페이백 계산결과1 (세율 {tax}% 기준) ",
-					description = f"**```fix\n{reault_payback}```**",
-					color=0x00ff00
-					)
-			embed.add_field(name = "⚖️ 거래소", value = f"```등록가 : {input_money_data[0]}\n정산가 : {price_reg_tax}\n세 금 : {input_money_data[0]-price_reg_tax}```")
-			embed.add_field(name = "🕵️ 실거래", value = f"```등록가 : {input_money_data[1]}\n정산가 : {price_real_tax}\n세 금 : {input_money_data[1]-price_real_tax}```")
-			await ctx.send(embed = embed)
-
 			embed2 = discord.Embed(
 					title = f"🧮  페이백 계산결과2 (세율 {tax}% 기준) ",
 					description = f"**```fix\n{reault_payback1}```**",
