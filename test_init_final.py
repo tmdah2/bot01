@@ -460,7 +460,7 @@ async def MakeSound(saveSTR, filename):
 	if aws_key != "" and aws_secret_key != "":
 		polly = boto3.client("polly", aws_access_key_id = aws_key, aws_secret_access_key = aws_secret_key, region_name = "eu-west-1")
 
-		s = '<speak><prosody rate="' + str(100) + '%">' +  saveSTR + '</prosody></speak>'
+		s = '<speak><prosody rate="' + str(95) + '%">' +  saveSTR + '</prosody></speak>'
 
 		response = polly.synthesize_speech(
 			TextType = "ssml",
@@ -475,7 +475,7 @@ async def MakeSound(saveSTR, filename):
 			mp3file.write(data)
 	else:	
 		tts = gTTS(saveSTR, lang = 'ko')
-		tts.save(f"./{filename}.mp3")
+		tts.save(f"./{filename}.wav")
 
 #mp3 파일 재생함수	
 async def PlaySound(voiceclient, filename):
@@ -1240,6 +1240,7 @@ class mainCog(commands.Cog):
 			command_list += ','.join(command[11]) + ' [인원] [금액]\n'     #!분배
 			command_list += ','.join(command[12]) + ' [뽑을인원수] [아이디1] [아이디2]...\n'     #!사다리
 			command_list += ','.join(command[27]) + ' [아이디1] [아이디2]...(최대 12명)\n'     #!경주
+			command_list += ','.join(command[41]) + ' [추첨인원] (대기시간/초) *(메모)\n'    #!럭키박스
 			command_list += ','.join(command[35]) + ' [판매금액] (거래소세금)\n'     #!수수료
 			command_list += ','.join(command[36]) + ' [거래소금액] [실거래금액] (거래소세금)\n'     #!페이백
 			command_list += ','.join(command[13]) + ' [아이디]\n'     #!정산
@@ -2060,10 +2061,17 @@ class mainCog(commands.Cog):
 			sayMessage = msg
 			try:
 				await MakeSound(ctx.message.author.display_name +'님이, ' + sayMessage, './sound/say')
-				await ctx.send("```< " + ctx.author.display_name + " >님이 \"" + sayMessage + "\"```", tts=False)
-				await PlaySound(ctx.voice_client, './sound/say.mp3')
 			except:
-				await ctx.send( f"```음성 접속에 문제가 있거나 음성채널에 되지 않은 상태입니다.!```")
+				await ctx.send( f"```음성파일 생성에 실패하였습니다.!(amazon polly 사용시 키 값을 확인하세요!)```")
+				return
+			await ctx.send("```< " + ctx.author.display_name + " >님이 \"" + sayMessage + "\"```", tts=False)
+			try:
+				if aws_key != "" and aws_secret_key != "":
+					await PlaySound(ctx.voice_client, './sound/say.mp3')
+				else:
+					await PlaySound(ctx.voice_client, './sound/say.wav')
+			except:
+				await ctx.send( f"```음성파일 재생에 실패하였습니다. 접속에 문제가 있거나 음성채널에 접속 되지 않은 상태입니다.!```")
 				return
 		else:  
 			return
@@ -2173,10 +2181,22 @@ class mainCog(commands.Cog):
 					aa.append(bossData[i][0])		                     #output_bossData[0] : 보스명
 					if bossMungFlag[i] == True :
 						aa.append(tmp_bossTime[i])                       #output_bossData[1] : 시간
+
+						# if (datetime.datetime.now() + datetime.timedelta(hours=int(basicSetting[0]))).strftime('%Y-%m-%d') == tmp_bossTime[i].strftime('%Y-%m-%d'):
+						# 	aa.append(tmp_bossTime[i].strftime('%H:%M:%S'))
+						# else:
+						# 	aa.append(f"[{tmp_bossTime[i].strftime('%Y-%m-%d')}] {tmp_bossTime[i].strftime('%H:%M:%S')}")
+
 						aa.append(tmp_bossTime[i].strftime('%H:%M:%S'))  #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(tmp_bossTime[i].strftime('%H:%M'))  
 						aa.append('-')	                                 #output_bossData[3] : -
 					else :
 						aa.append(bossTime[i])                           #output_bossData[1] : 시간
+
+						# if (datetime.datetime.now() + datetime.timedelta(hours=int(basicSetting[0]))).strftime('%Y-%m-%d') == bossTime[i].strftime('%Y-%m-%d'):
+						# 	aa.append(bossTime[i].strftime('%H:%M:%S'))
+						# else:
+						# 	aa.append(f"[{bossTime[i].strftime('%Y-%m-%d')}] {bossTime[i].strftime('%H:%M:%S')}")
+
 						aa.append(bossTime[i].strftime('%H:%M:%S'))      #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(bossTime[i].strftime('%H:%M'))  
 						aa.append('+')	                                 #output_bossData[3] : +
 					aa.append(bossData[i][2])                            #output_bossData[4] : 멍/미입력 보스
@@ -2334,11 +2354,23 @@ class mainCog(commands.Cog):
 					aa.append(bossData[i][0])		                     #output_bossData[0] : 보스명
 					if bossMungFlag[i] == True :
 						aa.append(tmp_bossTime[i])                       #output_bossData[1] : 시간
-						aa.append(tmp_bossTime[i].strftime('%H:%M:%S'))  #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(tmp_bossTime[i].strftime('%H:%M'))
+
+						if (datetime.datetime.now() + datetime.timedelta(hours=int(basicSetting[0]))).strftime('%Y-%m-%d') == tmp_bossTime[i].strftime('%Y-%m-%d'):
+							aa.append(tmp_bossTime[i].strftime('%H:%M:%S'))
+						else:
+							aa.append(f"[{tmp_bossTime[i].strftime('%Y-%m-%d')}] {tmp_bossTime[i].strftime('%H:%M:%S')}")
+
+						# aa.append(tmp_bossTime[i].strftime('%H:%M:%S'))  #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(tmp_bossTime[i].strftime('%H:%M'))
 						aa.append('-')	                                 #output_bossData[3] : -
 					else :
 						aa.append(bossTime[i])                           #output_bossData[1] : 시간
-						aa.append(bossTime[i].strftime('%H:%M:%S'))      #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(bossTime[i].strftime('%H:%M'))
+
+						if (datetime.datetime.now() + datetime.timedelta(hours=int(basicSetting[0]))).strftime('%Y-%m-%d') == bossTime[i].strftime('%Y-%m-%d'):
+							aa.append(bossTime[i].strftime('%H:%M:%S'))
+						else:
+							aa.append(f"[{bossTime[i].strftime('%Y-%m-%d')}] {bossTime[i].strftime('%H:%M:%S')}")
+							
+						# aa.append(bossTime[i].strftime('%H:%M:%S'))      #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(bossTime[i].strftime('%H:%M'))
 						aa.append('+')	                                 #output_bossData[3] : +
 					aa.append(bossData[i][2])                            #output_bossData[4] : 멍/미입력 보스
 					aa.append(bossMungCnt[i])	                         #output_bossData[5] : 멍/미입력횟수
@@ -3067,6 +3099,15 @@ class mainCog(commands.Cog):
 			reault_payback = price_reg_tax - price_real_tax
 			reault_payback1= price_reg_tax - input_money_data[1]
 
+			embed = discord.Embed(
+					title = f"🧮  페이백 계산결과1 (세율 {tax}% 기준) ",
+					description = f"**```fix\n{reault_payback}```**",
+					color=0x00ff00
+					)
+			embed.add_field(name = "⚖️ 거래소", value = f"```등록가 : {input_money_data[0]}\n정산가 : {price_reg_tax}\n세 금 : {input_money_data[0]-price_reg_tax}```")
+			embed.add_field(name = "🕵️ 실거래", value = f"```등록가 : {input_money_data[1]}\n정산가 : {price_real_tax}\n세 금 : {input_money_data[1]-price_real_tax}```")
+			await ctx.send(embed = embed)
+
 			embed2 = discord.Embed(
 					title = f"🧮  페이백 계산결과2 (세율 {tax}% 기준) ",
 					description = f"**```fix\n{reault_payback1}```**",
@@ -3169,6 +3210,109 @@ class mainCog(commands.Cog):
 		contents = repo.get_contents("test_setting.ini")
 		repo.update_file(contents.path, "test_setting", result_voice_use, contents.sha)
 		return await ctx.send(f"```보이스를 사용하지 않도록 설정하였습니다.!```")
+
+	################ 럭키박스 ################ 
+	@commands.command(name=command[41][0], aliases=command[41][1:])
+	async def command_randombox_game(self, ctx : commands.Context, *, args : str = None):
+		if ctx.message.channel.id != basicSetting[7] and ctx.message.channel.id != basicSetting[19]:
+			return
+
+		if not args:
+			return await ctx.send(f'```명령어 [추첨인원] (대기시간/초) *(메모) 형태로 입력해주시기 바랍나다.```')
+
+		memo_data : str = ""
+		waiting_time : int = 30
+
+		if args.find("*") == -1:
+			input_game_data = args.split()
+		else:
+			input_game_data = args[:args.find("*")-1].split()
+			memo_data = args[args.find("*")+1:]
+
+		try:
+			num_cong = int(input_game_data[0])  # 뽑을 인원
+			if num_cong <= 0:
+				return await ctx.send(f'```추첨인원이 0보다 작거나 같습니다. 재입력 해주세요```')
+		except ValueError:
+			return await ctx.send('```추첨인원은 숫자로 입력 바랍니다\nex)!럭키박스 1```')
+
+		if len(input_game_data) >= 2:
+			waiting_time : int = 30
+			try:
+				waiting_time = int(input_game_data[1])  # 대기시간
+				if waiting_time <= 0 :
+					return await ctx.send(f'```대기시간이 0보다 작거나 같습니다. 재입력 해주세요```')
+			except ValueError:
+				return await ctx.send(f'```대기시간(초)는 숫자로 입력 바랍니다\nex)!럭키박스 1 60```')
+
+		reaction_emoji : list = ["✅", "❌"]
+
+		embed = discord.Embed(title  = f"📦 럭키박스! 묻고 더블로 가! (잔여시간 : {waiting_time}초)", description = f"참가를 원하시면 ✅를 클릭해주세요!", timestamp =datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=int(basicSetting[0])))),
+			color=0x00ff00
+			)
+		if memo_data != "":
+			embed.add_field(name = "📜 메모", value =  f"```{memo_data}```", inline=False)
+
+		game_message : discord.message.Message = await ctx.send(embed = embed)
+
+		for emoji in reaction_emoji:
+			await game_message.add_reaction(emoji)
+		
+		cache_msg = await ctx.fetch_message(game_message.id)
+
+		for i in range(waiting_time):
+			embed.title = f"📦 럭키박스! 묻고 더블로 가! (잔여시간 : {waiting_time - i}초)"			
+			await game_message.edit(embed=embed)
+			cache_msg = await ctx.fetch_message(game_message.id)
+			if cache_msg.reactions[1].count >= 2:
+				tmp_users = await cache_msg.reactions[1].users().flatten()
+				for user in tmp_users:
+					if user.id == ctx.author.id:
+						embed.title = f"😫 럭키박스! 취소! 😱"
+						embed.description = ""
+						await game_message.edit(embed=embed)	
+						return await ctx.send(f"```게임이 취소되었습니다.!```")
+			await asyncio.sleep(1)
+
+		if cache_msg.reactions[0].count == 1:
+			embed.title = f"😫 럭키박스! 추첨 실패! 😱"
+			embed.description = ""
+			await game_message.edit(embed=embed)
+			return await ctx.send(f"```참여자가 없어 게임이 취소되었습니다.!```")
+
+		if num_cong >= cache_msg.reactions[0].count-1:
+			embed.title = f"😫 럭키박스! 추첨 실패! 😱"
+			embed.description = ""
+			await game_message.edit(embed=embed)		
+			return await ctx.send(f'```추첨인원이 참여인원과 같거나 많습니다. 재입력 해주세요```')
+
+		participant_users = await cache_msg.reactions[0].users().flatten()
+
+		del_index : int = 0
+		for i, user in enumerate(participant_users):
+			if self.bot.user.id == user.id:
+				del_index = i
+		del participant_users[del_index]
+
+		user_name_list : list = []
+		for user in participant_users:
+			user_name_list.append(user.display_name)
+
+		for _ in range(num_cong + 5):
+			random.shuffle(user_name_list)
+
+		for _ in range(num_cong + 5):
+			result_users = random.sample(user_name_list, num_cong)
+
+		lose_user = list(set(user_name_list)-set(result_users))
+
+		embed.title = f"🎉 럭키박스! 결과발표! 🎉"
+		embed.description = ""
+		embed.add_field(name = f"👥 참가자 ({len(user_name_list)}명)", value =  f"```fix\n{', '.join(user_name_list)}```", inline=False)
+		embed.add_field(name = f"😍 당첨 ({num_cong}명)", value =  f"```fix\n{', '.join(result_users)}```")
+		if len(lose_user) != 0:
+			embed.add_field(name = f"😭 낙첨 ({len(lose_user)}명)", value =  f"```{', '.join(lose_user)}```")
+		return await game_message.edit(embed=embed)
 
 	################ ?????????????? ################ 
 	@commands.command(name='!오빠')
