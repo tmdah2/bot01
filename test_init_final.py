@@ -3839,7 +3839,7 @@ class mainCog(commands.Cog):
 					bossFlag0[i] = True
 				result_boss_name.append(bossData[i][0])
 					
-		return await ctx.send(f"```[{', '.join(list(result_boss_name))}] 보스 [추가등록]이 완료되었습니다. [{command[27][0]}]으로 등록시간을 확인해보세요```", tts=False)
+		return await ctx.send(f"```[{', '.join(list(result_boss_name))}] 보스 [추가등록]이 완료되었습니다., tts=False)
 
 	################ ?????????????? ################ 
 	@commands.command(name='!오빠')
