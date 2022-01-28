@@ -2286,7 +2286,7 @@ class mainCog(commands.Cog):
 				sayMessage = " ".join(msg[1:])
 				contents = repo.get_contents("notice.ini")
 				repo.update_file(contents.path, "notice 등록", sayMessage, contents.sha)
-				await ctx.send( '< 공지 등록완료 >', tts=False)
+				await ctx.send( '< 등록완료 >', tts=False)
 			else:
 				notice_initdata = repo.get_contents("notice.ini")
 				notice = base64.b64decode(notice_initdata.content)
@@ -2298,7 +2298,7 @@ class mainCog(commands.Cog):
 							)
 				else :
 					embed = discord.Embed(
-							description= '```등록된 공지가 없습니다.```',
+							description= '```등록된 파일이 없습니다.```',
 							color=0xff00ff
 							)
 				await ctx.send(embed=embed, tts=False)
